@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# AIDriveWorkflow 生产部署脚本（在服务器 ~/AIDriveWorkflow 目录执行）
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT"
+
+if [[ -f .env ]]; then
+  set -a
+  # shellcheck source=/dev/null
+  source .env
+  set +a
+fi
+
+if [[ ! -f .env ]]; then
+  echo "错误: 缺少 .env 文件，请先复制并配置 .env.example"
+  exit 1
+fi
+
+echo "==> 构建并启动容器..."
+docker compose -f docker-compose.prod.yml up -d --build
+
+echo "==> 等待 PostgreSQL 就绪..."
+sleep 5
+
+echo "==> 执行数据库迁移..."
+docker compose -f docker-compose.prod.yml run --rm --no-deps backend alembic upgrade head
+
+echo "==> 确保 backend 已加载最新 schema..."
+docker compose -f docker-compose.prod.yml up -d backend
+sleep 3
+
+echo "==> 健康检查..."
+HEALTH_PATH="${APP_HEALTH_PATH:-/health}"
+curl -sf "http://127.0.0.1:3320${HEALTH_PATH}"
+echo ""
+curl -sf -o /dev/null -w "前端 HTTP %{http_code}\n" "http://127.0.0.1:3320${VITE_BASE_PATH:-/}"
+
+echo "==> 容器状态:"
+docker compose -f docker-compose.prod.yml ps
+
+echo ""
+echo "部署完成。本地访问: http://127.0.0.1:3320"
+echo "公网访问需确保云防火墙/安全组已放行 TCP 3320"
