@@ -8,9 +8,14 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write src"
   },
   "dependencies": {
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
     "katex": "^0.16.28",
     "lucide-react": "^0.563.0",
     "react": "^19.2.4",
@@ -18,15 +23,14 @@
     "react-hot-toast": "^2.6.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.13.0",
+    "recharts": "^3.7.0",
     "rehype-highlight": "^7.0.2",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
-    "remark-math": "^6.0.0",
-    "recharts": "^3.7.0",
-    "jspdf": "^3.0.1",
-    "html2canvas": "^1.4.1"
+    "remark-math": "^6.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^22.14.0",
@@ -34,11 +38,17 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.24",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "jsdom": "^28.1.0",
     "postcss": "^8.5.3",
+    "prettier": "^3.9.10",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.8.2",
+    "typescript-eslint": "^8.71.2",
     "vite": "^6.2.0",
-    "vitest": "^4.0.18",
-    "jsdom": "^28.1.0"
+    "vitest": "^4.0.18"
   }
 }

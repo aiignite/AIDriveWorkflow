@@ -302,7 +302,7 @@ async def update_user_org(
     if body.role is not None:
         user.role = body.role
     if body.password:
-        user.password_hash = AuthService.hash_password(body.password)
+        user.password_hash = await AuthService.hash_password(body.password)
     await db.commit()
     await db.refresh(user)
     return SystemUserOut(

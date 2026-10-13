@@ -3,10 +3,10 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 import uuid
 from datetime import datetime
-import time
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 from fastapi import APIRouter, Depends, File, Query, UploadFile
@@ -16,8 +16,8 @@ from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.ai_tools.registry import ToolRegistry
 import app.ai_tools  # noqa: F401
+from app.ai_tools.registry import ToolRegistry
 from app.auth import get_current_user
 from app.database import get_db
 from app.exceptions import BadRequestException, NotFoundException
@@ -50,19 +50,19 @@ class AIModelOut(BaseModel):
     name: str
     modelId: str = Field(validation_alias="model_id")
     provider: str
-    endpoint: Optional[str] = None
-    description: Optional[str] = None
+    endpoint: str | None = None
+    description: str | None = None
     isPublic: bool = Field(validation_alias="is_public")
-    createdAt: Optional[datetime] = Field(None, validation_alias="created_at")
+    createdAt: datetime | None = Field(None, validation_alias="created_at")
 
 
 class AIModelCreate(BaseModel):
     name: str
     model_id: str
     provider: str = "OLLAMA"
-    endpoint: Optional[str] = None
-    api_key: Optional[str] = None
-    description: Optional[str] = None
+    endpoint: str | None = None
+    api_key: str | None = None
+    description: str | None = None
     is_public: bool = True
     popularity: int = 50
     speed: str = "Fast"
@@ -74,87 +74,87 @@ class AIModelCreate(BaseModel):
 
 
 class AIModelUpdate(BaseModel):
-    name: Optional[str] = None
-    model_id: Optional[str] = None
-    provider: Optional[str] = None
-    endpoint: Optional[str] = None
-    api_key: Optional[str] = None
-    description: Optional[str] = None
-    is_public: Optional[bool] = None
-    popularity: Optional[int] = None
-    speed: Optional[str] = None
-    cost: Optional[str] = None
-    context: Optional[str] = None
-    supports_text: Optional[bool] = None
-    supports_image: Optional[bool] = None
-    set_as_default: Optional[bool] = None
+    name: str | None = None
+    model_id: str | None = None
+    provider: str | None = None
+    endpoint: str | None = None
+    api_key: str | None = None
+    description: str | None = None
+    is_public: bool | None = None
+    popularity: int | None = None
+    speed: str | None = None
+    cost: str | None = None
+    context: str | None = None
+    supports_text: bool | None = None
+    supports_image: bool | None = None
+    set_as_default: bool | None = None
 
 
 class AIAssistantOut(BaseModel):
     model_config = {"from_attributes": True}
     id: uuid.UUID
     name: str
-    description: Optional[str] = None
-    avatar: Optional[str] = None
-    role: Optional[str] = None
-    category: Optional[str] = None
+    description: str | None = None
+    avatar: str | None = None
+    role: str | None = None
+    category: str | None = None
     systemPrompt: str = Field(validation_alias="system_prompt")
-    model: Optional[str] = None
-    temperature: Optional[float] = None
-    maxTokens: Optional[int] = Field(None, validation_alias="max_tokens")
+    model: str | None = None
+    temperature: float | None = None
+    maxTokens: int | None = Field(None, validation_alias="max_tokens")
     isSystem: bool = Field(validation_alias="is_system")
     isDefault: bool = Field(validation_alias="is_default")
-    tools: Optional[list[str]] = None
+    tools: list[str] | None = None
 
 
 class AIAssistantUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    avatar: Optional[str] = None
-    role: Optional[str] = None
-    category: Optional[str] = None
-    system_prompt: Optional[str] = None
-    model: Optional[str] = None
-    temperature: Optional[float] = None
-    max_tokens: Optional[int] = None
-    is_default: Optional[bool] = None
-    tools: Optional[list[str]] = None
+    name: str | None = None
+    description: str | None = None
+    avatar: str | None = None
+    role: str | None = None
+    category: str | None = None
+    system_prompt: str | None = None
+    model: str | None = None
+    temperature: float | None = None
+    max_tokens: int | None = None
+    is_default: bool | None = None
+    tools: list[str] | None = None
 
 
 class AIAssistantCreate(BaseModel):
     name: str
-    description: Optional[str] = None
-    avatar: Optional[str] = None
-    role: Optional[str] = None
-    category: Optional[str] = "General"
+    description: str | None = None
+    avatar: str | None = None
+    role: str | None = None
+    category: str | None = "General"
     system_prompt: str
-    model: Optional[str] = None
+    model: str | None = None
     temperature: float = 0.7
     max_tokens: int = 16384
     is_default: bool = False
-    tools: Optional[list[str]] = None
+    tools: list[str] | None = None
 
 
 class AISettingsOut(BaseModel):
-    defaultModelName: Optional[str] = None
-    defaultProvider: Optional[str] = None
+    defaultModelName: str | None = None
+    defaultProvider: str | None = None
     sidebarWidth: int = 400
 
 
 class AISettingsUpdate(BaseModel):
-    default_model_name: Optional[str] = None
-    default_provider: Optional[str] = None
-    sidebar_width: Optional[int] = None
+    default_model_name: str | None = None
+    default_provider: str | None = None
+    sidebar_width: int | None = None
 
 
 class ConversationOut(BaseModel):
     model_config = {"from_attributes": True}
     id: uuid.UUID
-    title: Optional[str] = None
-    assistantName: Optional[str] = Field(None, validation_alias="assistant_name")
-    model: Optional[str] = None
-    createdAt: Optional[datetime] = Field(None, validation_alias="created_at")
-    updatedAt: Optional[datetime] = Field(None, validation_alias="updated_at")
+    title: str | None = None
+    assistantName: str | None = Field(None, validation_alias="assistant_name")
+    model: str | None = None
+    createdAt: datetime | None = Field(None, validation_alias="created_at")
+    updatedAt: datetime | None = Field(None, validation_alias="updated_at")
 
 
 class MessageOut(BaseModel):
@@ -162,17 +162,17 @@ class MessageOut(BaseModel):
     id: uuid.UUID
     role: str
     content: str
-    toolResults: Optional[list] = Field(None, validation_alias="tool_results")
-    createdAt: Optional[datetime] = Field(None, validation_alias="created_at")
+    toolResults: list | None = Field(None, validation_alias="tool_results")
+    createdAt: datetime | None = Field(None, validation_alias="created_at")
 
 
 class ChatStreamRequest(BaseModel):
     message: str
-    assistant_name: Optional[str] = "笔记助手"
-    conversation_id: Optional[uuid.UUID] = None
-    model_id: Optional[str] = None
-    page_context: Optional[dict[str, Any]] = None
-    attachment_ids: Optional[list[str]] = None
+    assistant_name: str | None = "笔记助手"
+    conversation_id: uuid.UUID | None = None
+    model_id: str | None = None
+    page_context: dict[str, Any] | None = None
+    attachment_ids: list[str] | None = None
 
 
 class SkillOut(BaseModel):
@@ -180,7 +180,7 @@ class SkillOut(BaseModel):
     id: uuid.UUID
     code: str
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     promptTemplate: str = Field(validation_alias="prompt_template")
     toolNames: list = Field(validation_alias="tool_names")
     keywords: list = Field(default_factory=list)
@@ -198,7 +198,7 @@ class SkillBindingItem(BaseModel):
 class SkillCreate(BaseModel):
     code: str
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     prompt_template: str = ""
     tool_names: list[str] = Field(default_factory=list)
     keywords: list[str] = Field(default_factory=list)
@@ -207,13 +207,13 @@ class SkillCreate(BaseModel):
 
 
 class SkillUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    prompt_template: Optional[str] = None
-    tool_names: Optional[list[str]] = None
-    keywords: Optional[list[str]] = None
-    priority: Optional[int] = None
-    is_enabled: Optional[bool] = None
+    name: str | None = None
+    description: str | None = None
+    prompt_template: str | None = None
+    tool_names: list[str] | None = None
+    keywords: list[str] | None = None
+    priority: int | None = None
+    is_enabled: bool | None = None
 
 
 def _skill_to_out(s: AISkill) -> dict[str, Any]:

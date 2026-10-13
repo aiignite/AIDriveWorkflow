@@ -55,17 +55,17 @@ async def _resolve_users_for_role(db: AsyncSession, role_ref: str) -> list[uuid.
     secondary = await db.execute(
         select(UserRole.user_id).where(UserRole.role_id.in_(role_ids))
     )
-    for uid in secondary.scalars().all():
+    # 单次 IN 批量查询过滤活跃用户，避免逐个 SELECT 的 N+1 往返
+    candidate_ids = list(secondary.scalars().all())
+    if candidate_ids:
         active = await db.execute(
             select(UserModel.id).where(
-                UserModel.id == uid,
+                UserModel.id.in_(candidate_ids),
                 UserModel.status == "Active",
                 UserModel.is_deleted == False,  # noqa: E712
             )
         )
-        found = active.scalar_one_or_none()
-        if found:
-            assignee_ids.add(found)
+        assignee_ids.update(active.scalars().all())
 
     return list(assignee_ids)
 

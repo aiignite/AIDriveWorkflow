@@ -30,8 +30,19 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         output: {
+          // 重依赖分包：charts 仅仪表盘用、markdown 全家桶仅 AI 侧栏用，
+          // 拆离后首屏（登录页等）不再下载这些体积，且升级时缓存命中率更高
           manualChunks: {
             'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            'vendor-charts': ['recharts'],
+            'vendor-markdown': [
+              'react-markdown',
+              'remark-gfm',
+              'remark-math',
+              'rehype-katex',
+              'rehype-highlight',
+              'katex',
+            ],
           },
         },
       },

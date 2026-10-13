@@ -6,8 +6,8 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai_tools.registry import ToolRegistry
 import app.ai_tools  # noqa: F401
+from app.ai_tools.registry import ToolRegistry
 from app.config import get_settings
 from app.models.ai import (
     AIAssistant,

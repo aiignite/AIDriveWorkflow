@@ -1,0 +1,29 @@
+# Ruff 配置 — AIDriveWorkflow 后端
+# 仅启用正确性/导入排序/现代语法规则，首轮不做风格大清洗
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = [
+  "E",   # pycodestyle 错误
+  "F",   # pyflakes（未使用导入/变量、未定义名称）
+  "I",   # isort 导入排序
+  "B",   # flake8-bugbear 常见错误模式
+  "UP",  # pyupgrade 现代语法
+]
+ignore = [
+  "E501",  # 行超长不强制（部分种子数据/长字符串天然超长）
+  "E712",  # SQLAlchemy 查询需要 == True/False 形式
+  "E741",  # 模型列名单字符（l/I）暂不处理
+  "B008",  # FastAPI 依赖注入默认参数（Depends/Query 等）是框架惯例
+  "UP042", # Str/IntEnum 迁移存在序列化行为差异，暂不自动改
+]
+
+[lint.per-file-ignores]
+# 路由模块为规避循环导入，在模块级常量后集中导入依赖
+"app/routers/ai/platform.py" = ["E402"]
+# 模型注册表：导入即为注册 SQLAlchemy 模型（供 Base.metadata 收集），非未使用导入
+"app/models/__init__.py" = ["F401"]
+
+[lint.isort]
+known-first-party = ["app"]

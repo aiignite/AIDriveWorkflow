@@ -4,12 +4,12 @@ from __future__ import annotations
 import json
 import logging
 import uuid
-from typing import Any, AsyncIterator
+from collections.abc import AsyncIterator
+from typing import Any
 
-from sqlalchemy import desc, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai_tools.registry import ToolRegistry
 from app.models.ai import AIAssistant, AIConversation, AIMessage
 from app.services.ai.attachment_service import AttachmentService
 from app.services.ai.llm_router import LLMRouter

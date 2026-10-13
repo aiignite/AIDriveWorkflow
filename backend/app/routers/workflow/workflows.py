@@ -10,7 +10,12 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth import get_current_user
 from app.database import get_db
+from app.exceptions import (
+    BadRequestException,
+    NotFoundException,
+)
 from app.models.user import User
 from app.schemas.workflow import (
     TaskCompleteRequest,
@@ -28,11 +33,6 @@ from app.schemas.workflow import (
     WorkflowTaskSummary,
 )
 from app.services.workflow.workflow_service import WorkflowEngine, WorkflowService
-from app.auth import get_current_user
-from app.exceptions import (
-    BadRequestException,
-    NotFoundException,
-)
 
 router = APIRouter(prefix="/workflows", tags=["Workflows"])
 instance_router = APIRouter(prefix="/workflow-instances", tags=["Workflow Instances"])
@@ -205,7 +205,6 @@ async def start_instance(
 ):
     engine = WorkflowEngine(db)
     try:
-        entity_type = body.entity_type
         instance = await engine.start_instance(
             definition_id=body.definition_id,
             title=body.title,
@@ -564,7 +563,6 @@ async def get_entity_detail_endpoint(
     import importlib
 
     from app.services.workflow.workflow_integration import (
-        GENERIC_ENTITY_FIELDS,
         get_entity_config,
         resolve_detail_route_async,
         resolve_entity_type,
@@ -676,3 +674,9 @@ async def list_entity_fields_endpoint(
     module = importlib.import_module(module_path)
     model_cls = getattr(module, class_name)
     mapper = sa_inspect(model_cls)
+    # 返回实体模型全部列的字段元信息（key/type/nullable），供设计器视图配置编辑器使用
+    fields = [
+        {"key": col.key, "type": str(col.type), "nullable": bool(col.nullable)}
+        for col in mapper.columns
+    ]
+    return {"entity_type": canonical, "fields": fields}

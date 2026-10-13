@@ -66,6 +66,7 @@ AIDriveWorkflow/
 ```bash
 # 1. 安装后端依赖
 cd backend && pip install -r requirements.txt && cd ..
+# 生产环境建议使用锁定版本：pip install -r requirements.lock
 
 # 2. 创建数据库（首次）
 createdb -h 127.0.0.1 -U postgres ai_drive_workflow

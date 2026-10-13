@@ -52,7 +52,7 @@ class SSOService:
             user = User(
                 email=email,
                 name=name,
-                password_hash=AuthService.hash_password(secrets.token_urlsafe(32)),
+                password_hash=await AuthService.hash_password(secrets.token_urlsafe(32)),
                 role=target_role,
                 status=note_status,
             )

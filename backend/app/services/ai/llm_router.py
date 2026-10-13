@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.models.ai import AIModel, UserAISettings
-from app.services.ai_providers.base import AIProviderConfig
 
 
 @dataclass

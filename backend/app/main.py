@@ -9,20 +9,20 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import app.ai_tools  # noqa: F401 — register AI tools
+import app.models.ai  # noqa: F401 — register AI tables
+import app.models.notification  # noqa: F401 — register notification tables
+import app.models.org  # noqa: F401 — register org tables
+import app.models.workflow  # noqa: F401 — register workflow tables
 from app.config import get_settings
 from app.database import AsyncSessionLocal
 from app.exceptions import AppException
+from app.routers.admin.users import router as admin_users_router
+from app.routers.ai import router as ai_router
 from app.routers.auth import router as auth_router
 from app.routers.users import router as users_router
-from app.routers.ai import router as ai_router
-from app.routers.admin.users import router as admin_users_router
-from app.services.ai.seed_service import AISeedService
 from app.services.admin_bootstrap import AdminBootstrap
-import app.ai_tools  # noqa: F401 — register AI tools
-import app.models.ai  # noqa: F401 — register AI tables
-import app.models.org  # noqa: F401 — register org tables
-import app.models.workflow  # noqa: F401 — register workflow tables
-import app.models.notification  # noqa: F401 — register notification tables
+from app.services.ai.seed_service import AISeedService
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -64,9 +64,9 @@ app.add_middleware(
 
 API_PREFIX = "/api/v1"
 
-from app.routers.system import router as system_router  # noqa: E402
-from app.routers.notifications import router as notifications_router  # noqa: E402
 from app.routers.files import router as files_router  # noqa: E402
+from app.routers.notifications import router as notifications_router  # noqa: E402
+from app.routers.system import router as system_router  # noqa: E402
 from app.routers.workflow import register_routers  # noqa: E402
 
 app.include_router(auth_router, prefix=API_PREFIX)

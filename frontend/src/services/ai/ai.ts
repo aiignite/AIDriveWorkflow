@@ -214,7 +214,7 @@ export const aiApi = {
   }),
 
   listConversations: () => api.get<AIConversation[]>('/ai/conversations'),
-  createConversation: (assistantName = '工作流助手') =>
+  createConversation: (_assistantName = '工作流助手') =>
     api.post<AIConversation>('/ai/conversations', undefined),
   deleteConversation: (id: string) => api.delete(`/ai/conversations/${id}`),
   listMessages: (conversationId: string) =>

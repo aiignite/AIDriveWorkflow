@@ -5,10 +5,9 @@ the stored filename stem, served back via GET /files/{file_id}.
 """
 from __future__ import annotations
 
+import os
 import uuid
 from pathlib import Path
-
-import os
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse

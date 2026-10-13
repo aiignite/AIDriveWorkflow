@@ -29,3 +29,6 @@ __pycache__/
 
 # ZCode session artifacts
 .zcode/
+
+# Trae session artifacts
+.trae/

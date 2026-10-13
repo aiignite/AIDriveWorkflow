@@ -4,7 +4,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -101,6 +101,12 @@ class WorkflowEdge(Base):
 class WorkflowInstance(Base):
     """工作流实例 - 一个已启动的流程运行"""
     __tablename__ = "wfl_instances"
+    # 热路径索引：状态过滤、按发起人查实例、按定义聚合统计
+    __table_args__ = (
+        Index("ix_wfl_instances_definition_id", "definition_id"),
+        Index("ix_wfl_instances_initiated_by_id", "initiated_by_id"),
+        Index("ix_wfl_instances_status", "status"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     definition_id: Mapped[uuid.UUID] = mapped_column(
@@ -143,6 +149,11 @@ class WorkflowInstance(Base):
 class WorkflowTask(Base):
     """工作流任务 - 分配给具体用户的待办"""
     __tablename__ = "wfl_tasks"
+    # 热路径索引：「我的待办」按 assignee_id + status 过滤是最频繁查询；instance_id 供实例详情/级联查询
+    __table_args__ = (
+        Index("ix_wfl_tasks_assignee_status", "assignee_id", "status"),
+        Index("ix_wfl_tasks_instance_id", "instance_id"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     instance_id: Mapped[uuid.UUID] = mapped_column(
@@ -196,6 +207,11 @@ class WorkflowTask(Base):
 class WorkflowInstanceLog(Base):
     """工作流执行日志 - 完整的审计轨迹"""
     __tablename__ = "wfl_instance_logs"
+    # 热路径索引：日志时间线按实例/任务过滤查询
+    __table_args__ = (
+        Index("ix_wfl_instance_logs_instance_id", "instance_id"),
+        Index("ix_wfl_instance_logs_task_id", "task_id"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     instance_id: Mapped[uuid.UUID] = mapped_column(

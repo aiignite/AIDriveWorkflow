@@ -4,11 +4,16 @@ from __future__ import annotations
 import json
 import logging
 import uuid
-from typing import Any, AsyncIterator
+from collections.abc import AsyncIterator
+from typing import Any
 
 import httpx
 
-from app.services.ai_providers.base import AIProviderConfig, BaseAIProvider, ChatMessage, ChatOptions
+from app.services.ai_providers.base import (
+    BaseAIProvider,
+    ChatMessage,
+    ChatOptions,
+)
 
 logger = logging.getLogger(__name__)
 

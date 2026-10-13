@@ -21,7 +21,7 @@ from app.services.workflow.workflow_service import (
 async def _make_user(db: AsyncSession, email: str, name: str, *, role_id: uuid.UUID | None = None) -> User:
     user = User(
         email=email,
-        password_hash=AuthService.hash_password("UserPassword123!"),
+        password_hash=await AuthService.hash_password("UserPassword123!"),
         name=name,
         status="Active",
         role_id=role_id,
